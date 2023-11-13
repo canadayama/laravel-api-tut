@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: laravelapi-nginx
+    restart: unless-stopped
+    ports:
+      - ${NGINX_PORT_OUT}:80
+    volumes:
+      - ./scripts/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+      - ./src:/var/www/html
+    networks:
+      - laravelapi
+
+  mariadb:
+    image: mariadb:10.11
+    container_name: laravelapi-mariadb
+    restart: unless-stopped
+    tty: true
+    ports:
+      - ${DB_PORT_OUT}:3306
+    volumes:
+      - laravelapi:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_USERNAME: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mariadb
+    networks:
+      - laravelapi
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravelapi-app
+    restart: unless-stopped
+    volumes:
+      - ./src:/var/www/html
+    ports:
+      - 9000:9000
+    networks:
+      - laravelapi
+    depends_on:
+      - nginx
+      - mariadb
+
+volumes:
+  laravelapi:
+
+networks:
+  laravelapi:
