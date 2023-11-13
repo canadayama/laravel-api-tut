@@ -21,27 +21,35 @@ services:
     ports:
       - ${DB_PORT_OUT}:3306
     volumes:
-      - laravelapi:/var/lib/mysql
+      - data:/var/lib/mysql
+    networks:
+      - laravelapi
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_USERNAME: ${DB_USERNAME}
+      MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
       SERVICE_TAGS: dev
       SERVICE_NAME: mariadb
-    networks:
-      - laravelapi
 
   app:
     build:
       context: .
       dockerfile: Dockerfile
+      #args:
+        #USER_ID: ${USER_ID:-0}
+        #GROUP_ID: ${GROUP_ID:-0}
+    #user: $USER_ID:$GROUP_ID
     container_name: laravelapi-app
     restart: unless-stopped
-    volumes:
-      - ./src:/var/www/html
     ports:
       - 9000:9000
+    volumes:
+      - ./src:/var/www/html
+      # Setup user in container
+      #- /etc/group:/etc/group:ro
+      #- /etc/passwd:/etc/passwd:ro
+      #- /etc/shadow:/etc/shadow:ro
     networks:
       - laravelapi
     depends_on:
@@ -49,7 +57,7 @@ services:
       - mariadb
 
 volumes:
-  laravelapi:
+  data:
 
 networks:
   laravelapi:
