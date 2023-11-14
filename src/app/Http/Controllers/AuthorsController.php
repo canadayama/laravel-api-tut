@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Author;
+use App\Http\Requests\AuthorsRequest;
+use App\Http\Resources\AuthorsResource;
 use App\Http\Requests\StoreAuthorRequest;
 use App\Http\Requests\UpdateAuthorRequest;
-use App\Models\Author;
-use App\Http\Resources\AuthorsResource;
 
 class AuthorsController extends Controller
 {
@@ -16,17 +17,7 @@ class AuthorsController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return AuthorsResource::collection(Author::all());
     }
 
     /**
@@ -37,7 +28,11 @@ class AuthorsController extends Controller
      */
     public function store(StoreAuthorRequest $request)
     {
-        //
+        $author = Author::create([
+             'name' => $request->input('name')
+        ]);
+
+        return new AuthorsResource($author);
     }
 
     /**
@@ -52,17 +47,6 @@ class AuthorsController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Author  $author
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Author $author)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \App\Http\Requests\UpdateAuthorRequest  $request
@@ -71,7 +55,11 @@ class AuthorsController extends Controller
      */
     public function update(UpdateAuthorRequest $request, Author $author)
     {
-        //
+        $author->update([
+            'name' => $request->input('name')
+        ]);
+
+        return new AuthorsResource($author);
     }
 
     /**
@@ -82,6 +70,7 @@ class AuthorsController extends Controller
      */
     public function destroy(Author $author)
     {
-        //
+        $author->delete();
+        return response(null, 204);
     }
 }

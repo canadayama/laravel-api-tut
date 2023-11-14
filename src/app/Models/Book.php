@@ -5,27 +5,27 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Author extends Model
+class Book extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
-
+    protected $fillable = ['name', 'description', 'publication_year'];
+    
     protected $hidden = [
         'laravel_through_key',
         'created_at',
         'updated_at'
     ];
 
-    public function books()
+    public function author()
     {
         return $this->hasManyThrough(
-            '\App\Models\Book',
+            '\App\Models\Author',
             '\App\Models\BookAuthor',
-            'author_id',
+            'book_id',
             'id',
             'id',
-            'book_id'
+            'author_id'
         );
     }
 }
